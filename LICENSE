@@ -1,0 +1,25 @@
+Creative Commons Attribution 4.0 International
+
+Copyright (c) 2026 Hervé Trinh
+
+The original code, documentation, configuration files, scripts, synthetic data
+generators, and derived result summaries authored for this repository are
+licensed under the Creative Commons Attribution 4.0 International Public
+License (CC BY 4.0).
+
+SPDX-License-Identifier: CC-BY-4.0
+Canonical license URL: https://creativecommons.org/licenses/by/4.0/
+Legal code: https://creativecommons.org/licenses/by/4.0/legalcode
+
+You are free to share and adapt the licensed material for any purpose,
+including commercial use, provided that you give appropriate credit, provide a
+link to the license, and indicate if changes were made.
+
+This license does not apply to third-party assets used by the experiments,
+including but not limited to backbone model weights, datasets, images,
+annotations, pretrained tokenizers/processors, and third-party libraries. Those
+assets remain governed by their upstream licenses and terms of use.
+
+THE LICENSED MATERIAL IS PROVIDED "AS IS", WITHOUT WARRANTIES OR CONDITIONS OF
+ANY KIND, EITHER EXPRESS OR IMPLIED. See the CC BY 4.0 legal code for the full
+license terms and disclaimer.

@@ -1,0 +1,5 @@
+# Install from this directory. PyTorch/CUDA wheels may be installed first.
+# Dependencies have one source of truth in pyproject.toml.
+-e .[dev]
+# For Gemma 4, additionally install: pip install -e '.[gemma4]'
+# For optional 4-bit loading: pip install -e '.[quantization]'
