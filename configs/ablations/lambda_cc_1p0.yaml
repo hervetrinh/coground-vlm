@@ -1,0 +1,2 @@
+losses:
+  lambda_cc: 1.0

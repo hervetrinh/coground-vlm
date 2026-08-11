@@ -1,0 +1,5 @@
+extends:
+  - ../gemma4_refcoco_coground.yaml
+  - ../../../ablations/no_simplex_sigmoid.yaml
+experiment_id: revision_gemma4_refcoco_no_simplex
+variant: no_simplex_sigmoid

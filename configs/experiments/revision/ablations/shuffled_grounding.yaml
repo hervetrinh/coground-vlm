@@ -1,0 +1,5 @@
+extends:
+  - ../gemma4_refcoco_coground.yaml
+  - ../../../ablations/shuffled_grounding.yaml
+experiment_id: revision_gemma4_refcoco_shuffled_grounding
+variant: shuffled_grounding

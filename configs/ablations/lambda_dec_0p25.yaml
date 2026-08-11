@@ -1,0 +1,5 @@
+decoding:
+  enabled: true
+  lambda_dec: 0.25
+losses:
+  lambda_dec: 0.25

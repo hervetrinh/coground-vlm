@@ -1,0 +1,5 @@
+extends:
+  - ../gemma4_refcoco_coground.yaml
+  - ../../../ablations/frozen_cosine_affinity.yaml
+experiment_id: revision_gemma4_refcoco_frozen_cosine
+variant: frozen_cosine_affinity

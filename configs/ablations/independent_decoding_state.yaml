@@ -1,0 +1,4 @@
+decoding:
+  share_assignments: false
+  assignment_hidden_dim: 1024
+  assignment_mode: soft

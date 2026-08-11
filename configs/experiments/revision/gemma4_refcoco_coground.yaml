@@ -1,0 +1,3 @@
+extends: base_gemma4_refcoco.yaml
+experiment_id: revision_gemma4_refcoco_coground
+variant: coground_grounded

@@ -1,0 +1,5 @@
+extends:
+  - ../gemma4_refcoco_coground.yaml
+  - ../../../ablations/occupancy_block_solver.yaml
+experiment_id: revision_gemma4_refcoco_occupancy_solver
+variant: occupancy_solver

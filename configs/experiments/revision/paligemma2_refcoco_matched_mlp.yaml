@@ -1,0 +1,8 @@
+extends: paligemma2_refcoco_coground.yaml
+experiment_id: revision_paligemma2_refcoco_matched_mlp
+variant: matched_mlp_paligemma2_transfer
+method:
+  enabled: false
+grounding_baseline:
+  enabled: true
+  mode: matched_mlp

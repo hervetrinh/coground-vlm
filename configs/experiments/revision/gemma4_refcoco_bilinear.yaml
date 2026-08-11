@@ -1,0 +1,8 @@
+extends: base_gemma4_refcoco.yaml
+experiment_id: revision_gemma4_refcoco_bilinear
+variant: bilinear_grounding
+method:
+  enabled: false
+grounding_baseline:
+  enabled: true
+  mode: bilinear

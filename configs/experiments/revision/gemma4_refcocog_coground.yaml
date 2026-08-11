@@ -1,0 +1,12 @@
+extends: gemma4_refcoco_coground.yaml
+experiment_id: revision_gemma4_refcocog_coground
+variant: coground_refcocog_transfer
+dataset:
+  name: refcocog
+  image_root: data/refcoco
+  splits:
+    train: data/refcoco/manifests/refcocog_train.jsonl
+    val: data/refcoco/manifests/refcocog_val.jsonl
+    test: data/refcoco/manifests/refcocog_test.jsonl
+  train_split: train
+  eval_split: val

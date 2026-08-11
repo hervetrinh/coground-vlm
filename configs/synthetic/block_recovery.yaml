@@ -1,0 +1,24 @@
+experiment_id: synthetic_block_recovery
+seed: 17
+output_dir: results/runs
+synthetic:
+  batch_size: 16
+  eval_batch_size: 64
+  num_patches: 64
+  num_tokens: 32
+  dim: 64
+  k_patch: 8
+  k_token: 8
+  hidden_dim: 128
+  noise_std: 0.2
+  distractor_strength: 1.0
+  support_margin: 0.5
+  assignment_temperature: 0.1
+training:
+  max_steps: 500
+  lr: 1.0e-3
+losses:
+  lambda_cc: 1.0
+  lambda_recon: 1.0
+  lambda_entropy: 0.01
+  lambda_balance: 0.1

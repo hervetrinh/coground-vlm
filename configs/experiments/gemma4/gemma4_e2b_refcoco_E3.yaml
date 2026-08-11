@@ -1,0 +1,78 @@
+experiment_id: gemma4_e2b_refcoco_E3
+variant: E3
+seed: 17
+output_dir: results/runs
+runtime:
+  mixed_precision: bf16
+backbone:
+  kind: hf
+  model_id: ${oc.env:GEMMA4_MODEL_PATH,google/gemma-4-E2B-it}
+  torch_dtype: bfloat16
+  device_map: null
+  load_in_4bit: false
+  trust_remote_code: false
+  gradient_checkpointing: true
+  use_chat_template: true
+dataset:
+  name: refcoco
+  image_root: data/refcoco
+  splits:
+    train: data/refcoco/manifests/refcoco_train.jsonl
+    val: data/refcoco/manifests/refcoco_val.jsonl
+  train_split: train
+training:
+  batch_size: 1
+  num_workers: 4
+  max_steps: 500
+  gradient_accumulation_steps: 8
+  lr: 5.0e-5
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  freeze_backbone: true
+  save_every: 100
+logging:
+  tracker: null
+  log_every: 10
+lora:
+  enabled: true
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  task_type: CAUSAL_LM
+  target_modules: ["q_proj.linear", "v_proj.linear"]
+method:
+  enabled: true
+  dim: 1536
+  layer_tap: -1
+  k: 16
+  num_patch_clusters: 16
+  num_token_clusters: 16
+  hidden_dim: 1024
+  affinity_mode: bilinear
+  assignment_mode: soft
+  temperature: 1.0
+losses:
+  lambda_task: 0.1
+  lambda_cc: 1.0
+  lambda_recon: 1.0
+  lambda_entropy: 0.01
+  lambda_balance: 0.1
+  lambda_ground: 0.5
+  lambda_dec: 0.25
+decoding:
+  enabled: true
+  lambda_dec: 0.25
+  hidden_dim: 1536
+  mode: logit_proxy
+  require_true_attention_bias: false
+  stopgrad_assignments: true
+baseline:
+  name: none
+generation:
+  max_new_tokens: 48
+  do_sample: false
+  temperature: 1.0
+eval:
+  batch_size: 1
+  num_workers: 2

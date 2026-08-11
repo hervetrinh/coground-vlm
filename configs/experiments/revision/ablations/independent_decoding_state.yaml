@@ -1,0 +1,5 @@
+extends:
+  - ../gemma4_refcoco_decoding_prior.yaml
+  - ../../../ablations/independent_decoding_state.yaml
+experiment_id: revision_gemma4_refcoco_independent_decoding
+variant: independent_decoding_state

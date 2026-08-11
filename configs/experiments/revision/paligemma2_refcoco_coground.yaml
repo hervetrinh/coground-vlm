@@ -1,0 +1,16 @@
+extends: gemma4_refcoco_coground.yaml
+experiment_id: revision_paligemma2_refcoco_coground
+variant: coground_paligemma2_transfer
+backbone:
+  kind: paligemma2
+  model_id: ${oc.env:PALIGEMMA2_MODEL_PATH,google/paligemma2-3b-pt-224}
+  torch_dtype: bfloat16
+  device_map: null
+  load_in_4bit: false
+  trust_remote_code: false
+  gradient_checkpointing: true
+  use_chat_template: false
+method:
+  dim: auto
+grounding_baseline:
+  dim: auto

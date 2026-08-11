@@ -1,0 +1,13 @@
+extends: ../experiments/revision/gemma4_refcoco_decoding_prior.yaml
+experiment_id: revision_gemma4_pope
+variant: coground_vocab_logit_prior
+dataset:
+  name: pope
+  image_root: data/pope
+  splits:
+    val: data/pope/manifests/pope_val.jsonl
+  eval_split: val
+generation:
+  max_new_tokens: 8
+  do_sample: false
+  temperature: 1.0

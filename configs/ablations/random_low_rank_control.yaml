@@ -1,0 +1,4 @@
+variant: random_low_rank_control
+method:
+  enabled: true
+  control: random_low_rank

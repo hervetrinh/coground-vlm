@@ -1,0 +1,5 @@
+extends:
+  - ../gemma4_refcoco_coground.yaml
+  - ../../../ablations/identity_block_matrix.yaml
+experiment_id: revision_gemma4_refcoco_identity_block
+variant: identity_block

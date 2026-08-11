@@ -1,0 +1,8 @@
+extends: gemma4_refcocog_coground.yaml
+experiment_id: revision_gemma4_refcocog_bilinear
+variant: bilinear_refcocog_transfer
+method:
+  enabled: false
+grounding_baseline:
+  enabled: true
+  mode: bilinear

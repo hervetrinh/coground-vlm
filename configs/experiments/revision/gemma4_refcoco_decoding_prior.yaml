@@ -1,0 +1,10 @@
+extends: gemma4_refcoco_coground.yaml
+experiment_id: revision_gemma4_refcoco_decoding_prior
+variant: coground_vocab_logit_prior
+losses:
+  lambda_dec: 0.3
+decoding:
+  enabled: true
+  lambda_dec: 0.3
+  mode: vocab_logit_bias
+  share_assignments: true

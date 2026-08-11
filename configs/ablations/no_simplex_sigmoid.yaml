@@ -1,0 +1,5 @@
+method:
+  assignment_mode: sigmoid
+losses:
+  lambda_entropy: 0.0
+  lambda_balance: 0.0

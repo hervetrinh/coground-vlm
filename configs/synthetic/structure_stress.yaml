@@ -1,0 +1,19 @@
+experiment_id: synthetic_structure_stress
+seed: 17
+synthetic:
+  structures: [block, overlapping, continuous]
+  num_patches: 64
+  num_tokens: 32
+  dim: 64
+  k_patch: 8
+  k_token: 8
+  overlap_strength: 0.35
+  noise_levels: [0.1, 0.2, 0.4, 0.8]
+  distractor_strength: 1.0
+  support_margin: 0.5
+  temperature: 0.1
+training:
+  num_steps: 500
+  batch_size: 16
+eval:
+  batch_size: 64

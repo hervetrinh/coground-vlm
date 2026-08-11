@@ -1,0 +1,4 @@
+method:
+  k: 16
+  num_patch_clusters: 16
+  num_token_clusters: 16
