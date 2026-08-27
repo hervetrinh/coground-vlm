@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "Please cite the research paper when using this work."
+type: software
+title: "CoGround-VLM: Differentiable Patch-Token Co-Clustering for Visual Grounding in Vision-Language Models"
+authors:
+  - family-names: Trinh
+    given-names: Hervé
+    email: trinh.herve@gmail.com
+repository-code: "https://github.com/hervetrinh/coground-vlm"
+url: "https://github.com/hervetrinh/coground-vlm"
+version: 0.1.0
+license: CC-BY-4.0
+abstract: "Exploratory implementation and independent research paper on structured patch-token visual grounding."
