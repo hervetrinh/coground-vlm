@@ -44,7 +44,7 @@
 \maketitle
 
 \begin{abstract}
-Vision-language models can generate fluent descriptions without consistently exposing the local visual evidence behind their words. We propose \method, a differentiable patch-token co-clustering module with simplex-constrained assignments $U,V$ and a compact block interaction matrix $B$. The structured state supports alignment losses, support diagnostics, and a route to generation control. We distinguish the general soft-assignment least-squares block solution from occupancy averaging, which is exact for hard assignments, and give conditional reconstruction and supported-mass properties. The historical experimental summaries report support AUROC $0.713$--$0.928$ across a 480-run synthetic study and an increase from $0.631$ to $0.981$ in a 160-run cluster-count study. On frozen Gemma 4 E2B with a custom RefCOCO split, the earlier five-seed layer-zero head reaches pointing accuracy $0.215\pm0.031$ versus $0.138$ for untrained cosine, while spatial AUROC remains near chance. These comparisons do not isolate a co-clustering advantage from learned capacity, and the earlier decoding-combo configuration did not enable a generation intervention. We preserve the original experimental summaries as exploratory observations and supply corrected learned controls and an effective vocabulary-logit prior in the code. Those corrected experiments have not been executed for this version; generation faithfulness and broader transfer remain open empirical questions.
+Vision-language models can generate fluent descriptions without consistently exposing the local visual evidence behind their words. This paper proposes \method, a differentiable patch-token co-clustering module with simplex-constrained assignments $U,V$ and a compact block interaction matrix $B$. The structured state supports alignment losses, support diagnostics, and a route to generation control. The formulation distinguishes the general soft-assignment least-squares block solution from occupancy averaging, which is exact for hard assignments, and establishes conditional reconstruction and supported-mass properties. The historical experimental summaries report support AUROC $0.713$--$0.928$ across a 480-run synthetic study and an increase from $0.631$ to $0.981$ in a 160-run cluster-count study. On frozen Gemma 4 E2B with a custom RefCOCO split, the earlier five-seed layer-zero head reaches pointing accuracy $0.215\pm0.031$ versus $0.138$ for untrained cosine, while spatial AUROC remains near chance. These comparisons do not isolate a co-clustering advantage from learned capacity, and the earlier decoding-combo configuration did not enable a generation intervention. The original experimental summaries are retained as exploratory observations; the code supplies corrected learned controls and an effective vocabulary-logit prior. Those corrected experiments have not been executed for this version; generation faithfulness and broader transfer remain open empirical questions.
 \end{abstract}
 
 \section{Introduction}
@@ -52,13 +52,13 @@ Vision-language models can generate fluent descriptions without consistently exp
 
 Large vision-language models (VLMs) produce fluent answers and captions, yet they still generate unsupported objects, attributes, and relations when linguistic priors dominate local visual evidence \cite{rohrbach2018object,li2023pope}. A central problem is that local alignment stays implicit: the model has cross-attention, but it does not keep a compact record of which patches support which tokens.
 
-We treat local grounding as a structured latent object instead of leaving it as a side effect of attention. We propose \method, a differentiable patch-token co-clustering module that converts local affinities into latent blocks. These blocks regularize alignment, produce interpretable evidence maps, and bias decoding toward visually supported content. The intended interface reuses a co-clustered patch-token state across training losses, diagnostics, and generation; its empirical value must be tested against learned alternatives.
+This work treats local grounding as a structured latent object instead of leaving it as a side effect of attention. The proposed \method\ module converts local affinities into latent blocks through differentiable patch-token co-clustering. These blocks regularize alignment, produce interpretable evidence maps, and bias decoding toward visually supported content. The intended interface reuses a co-clustered patch-token state across training losses, diagnostics, and generation; its empirical value must be tested against learned alternatives.
 
-We also spell out what the bottleneck is doing. With fixed assignments, the latent block matrix solves a least-squares reconstruction problem; in the ideal block-constant case, it recovers the true affinities exactly; and under an explicit ordering assumption, the decoding bias shifts more attention mass toward supported patches. These are modest results, but they make the role of the bottleneck and the decoding prior easier to read.
+The analysis also specifies the role of the bottleneck. With fixed assignments, the latent block matrix solves a least-squares reconstruction problem; in the ideal block-constant case, it recovers the true affinities exactly; and under an explicit ordering assumption, the decoding bias shifts more attention mass toward supported patches. These are modest results, but they make the role of the bottleneck and the decoding prior easier to read.
 
-Our claim is narrow. We do \emph{not} argue that stronger grounding solves hallucination in general. We focus on settings where outputs depend on verifiable local evidence. We therefore complement the real-data evaluation with controlled synthetic studies in which the true patch-token support structure is known, allowing direct measurement of support discrimination, decoding-mass shifts, and misspecification robustness. The same structure also acts as a probe of where visual information remains accessible inside a frozen decoder stack, and the reported results indicate that this is most useful at the earliest LM tap.
+The claim is narrow: stronger grounding is \emph{not} assumed to solve hallucination in general. The investigation focuses on settings where outputs depend on verifiable local evidence. Controlled synthetic studies complement the real-data evaluation with known patch-token support structure, allowing direct measurement of support discrimination, decoding-mass shifts, and misspecification robustness. The same structure also acts as a probe of where visual information remains accessible inside a frozen decoder stack, and the reported results indicate that this is most useful at the earliest LM tap.
 
-Our contributions are fivefold:
+The paper makes five contributions:
 \begin{itemize}
     \item a differentiable co-clustering formulation for patch-token alignment in VLMs, together with token-level support scores that expose reusable grounding structure;
     \item mechanism-level guarantees for least-squares optimality, exact recovery in the ideal block-constant regime, and supported-mass monotonicity under the decoding bias;
@@ -74,26 +74,26 @@ Our contributions are fivefold:
 Grounded multimodal systems expose links between image regions and text, either through explicit region tokens or through cross-attentional fusion \cite{li2023blip2,microsoft2023kosmos2,liu2024llava}. They make local evidence accessible, but usually do not compress it into a stable structure reusable across decoding steps.
 
 \paragraph{Hallucination and faithfulness.}
-Object hallucination has been studied in captioning and multimodal instruction following through diagnostics such as CHAIR and POPE \cite{rohrbach2018object,li2023pope}. This version does not benchmark such full hallucination suites; instead, it focuses on the lower-level grounding signal that later mitigation systems could exploit. Our approach is complementary: instead of treating grounding as a side effect of attention, we make it an explicit latent structure between representation learning and decoding.
+Object hallucination has been studied in captioning and multimodal instruction following through diagnostics such as CHAIR and POPE \cite{rohrbach2018object,li2023pope}. This version does not benchmark such full hallucination suites; instead, it focuses on the lower-level grounding signal that later mitigation systems could exploit. The proposed approach makes grounding an explicit latent structure between representation learning and decoding, complementing these hallucination diagnostics.
 
 \paragraph{Adjacent mitigation baselines and novelty boundary.}
-Recent hallucination-mitigation methods intervene at decoding time or inside attention, for example through visual contrastive decoding, rollback-style penalties, or selective reweighting of informed visual tokens \cite{leng2024vcd,huang2024opera,arif2025paint}. Semantically grounded supervision methods such as SeGroS provide a stronger training-time comparison point \cite{kim2026segros}. Our claim is narrower: we are not proposing another decoding-only fix, but a co-clustered patch-token state shared by alignment regularization, support diagnostics, and generation-time control.
+Recent hallucination-mitigation methods intervene at decoding time or inside attention, for example through visual contrastive decoding, rollback-style penalties, or selective reweighting of informed visual tokens \cite{leng2024vcd,huang2024opera,arif2025paint}. Semantically grounded supervision methods such as SeGroS provide a stronger training-time comparison point \cite{kim2026segros}. The contribution examined here is a co-clustered patch-token state shared by alignment regularization, support diagnostics, and generation-time control.
 
 \paragraph{Co-clustering and latent block models.}
-Co-clustering jointly partitions the two axes of a matrix into interpretable homogeneous blocks \cite{dhillon2003itcc,govaert2013coclustering}. Our formulation follows the latent-block perspective in which row and column assignments summarize structure rather than only pairwise similarity \cite{govaert2013coclustering,govaert2008bernoulli,nadif2010continuous,govaert2018mutual}. It also connects to low-rank tri-factorization, where the block matrix becomes a learned intermediate object rather than a post-hoc visualization \cite{ding2006onmtf}.
+Co-clustering jointly partitions the two axes of a matrix into interpretable homogeneous blocks \cite{dhillon2003itcc,govaert2013coclustering}. The formulation follows the latent-block perspective in which row and column assignments summarize structure rather than only pairwise similarity \cite{govaert2013coclustering,govaert2008bernoulli,nadif2010continuous,govaert2018mutual}. It also connects to low-rank tri-factorization, where the block matrix becomes a learned intermediate object rather than a post-hoc visualization \cite{ding2006onmtf}.
 
 \section{Method}
 \label{sec:method}
 
 \subsection{Patch-token affinity and latent blocks}
 
-Given an image-prompt pair, let $P \in \R^{N_p \times d}$ denote visual patch embeddings and $T \in \R^{N_t \times d}$ text-token embeddings at a chosen fusion layer. We define an affinity matrix
+Given an image-prompt pair, let $P \in \R^{N_p \times d}$ denote visual patch embeddings and $T \in \R^{N_t \times d}$ text-token embeddings at a chosen fusion layer. The affinity matrix is defined as
 \[
 S \in \R^{N_p \times N_t}, \qquad S = PWT^{\top}/\sqrt{d},
 \]
 where $W \in \R^{d \times d}$ is learnable. In practice, $S$ can also be initialized from aggregated cross-attention maps; the bilinear form is simply the cleanest default parameterization.
 
-We then learn two soft assignment matrices,
+Two learned soft assignment matrices describe the memberships,
 \[
 U \in \Delta^{N_p \times K_p}, \qquad V \in \Delta^{N_t \times K_t},
 \]
@@ -116,7 +116,7 @@ The assignments are parameterized by lightweight MLP heads followed by row-wise 
 \[
 U = \softmax(f_p(P)), \qquad V = \softmax(f_t(T)).
 \]
-In the reference configuration we use $K_p=K_t=16$, which keeps the block space compact while leaving enough capacity for object- and phrase-level structure.
+The reference configuration uses $K_p=K_t=16$, which keeps the block space compact while leaving enough capacity for object- and phrase-level structure.
 
 \paragraph{Least-squares interpretation of the block matrix.}
 The block matrix also admits a simple formal interpretation when the assignments are fixed.
@@ -160,7 +160,7 @@ The co-clustering loss is
 \]
 where $H(\cdot)$ is row-wise entropy, $\bar U$ and $\bar V$ are empirical cluster occupancies, and $u_0,v_0$ are target priors, typically uniform. The entropy term discourages overly diffuse assignments; the balancing term discourages occupancy collapse without ruling it out mathematically. The corrected main configuration includes true grounding supervision. Stopping gradients through the reconstruction target alone does not remove self-reference, because $\hat S$ still depends on $S$ through $B$.
 
-When grounding annotations are available, we construct a binary or soft target matrix $G$ and add
+When grounding annotations are available, a binary or soft target matrix $G$ defines the additional grounding loss
 \[
 \mathcal{L}_{\mathrm{ground}} = \BCE\big(\sigma(\hat{S}), G\big).
 \]
@@ -172,7 +172,7 @@ where $\mathcal{L}_{\mathrm{task}}$ is the base VLM loss. If dense alignment lab
 
 \subsection{Block-aware decoding}
 
-The original theoretical proposal reuses latent blocks through an attention bias. It is retained here as a conditional mechanism, not a claim about an installed attention hook. Let $A_{ij}$ denote the attention logit from token position $j$ to patch $i$ inside the decoder. We define
+The original theoretical proposal reuses latent blocks through an attention bias. It is retained here as a conditional mechanism, not a claim about an installed attention hook. Let $A_{ij}$ denote the attention logit from token position $j$ to patch $i$ inside the decoder. The proposed modified logit is
 \[
 A'_{ij} = A_{ij} + \lambda_{\mathrm{dec}}\,\mathrm{stopgrad}\big((UM_jV^{\top})_{ij}\big),
 \]
@@ -206,7 +206,7 @@ Under the assumed ordering, patches in $G$ always receive support scores at leas
 
 \subsection{Interpretability signal and complexity}
 
-For the proposed attention mechanism at a token position $t$, let $M_t$ denote the token-conditioned block matrix used when scoring that decoding step. We define a support score
+For the proposed attention mechanism at a token position $t$, let $M_t$ denote the token-conditioned block matrix used when scoring that decoding step. The support score is defined as
 \[
 r(t) = \max_i (UM_tV^{\top})_{i,t},
 \]
@@ -264,13 +264,13 @@ All reported real-data runs use a single open-weight backbone, \texttt{google/ge
 
 The earlier manuscript records the following environment. Jobs ran in bf16 with PyTorch 2.9.1+cu128 on two NVIDIA A100 80GB PCIe GPUs; the reported experiments were executed in parallel across the two devices, while each individual training or evaluation run still occupies one GPU at a time. The host provides 128 CPU cores and 251~GB RAM. The text hidden size is 1536, the vision tower produces 768-dimensional features that are projected to 1536 through \texttt{embed\_vision}, and the visual sequence contains 260 tokens (a $16\times16$ spatial grid plus four special tokens). Unless noted otherwise, the RefCOCO runs use batch size 1, gradient accumulation 8, AdamW, weight decay 0.01, max gradient norm 1.0, mixed precision bf16, and the historical target builder. These hardware and layout details are reported provenance, not a newly verified integration result.
 
-We report four scopes on top of this shared setup: \textbf{S$_{\mathrm{massive}}$}, a 480-run synthetic comparison across 20 seeds, six noise levels, and four methods; \textbf{K$_{\mathrm{mis}}$}, a 160-run synthetic study of cluster-count misspecification with $K_{\mathrm{true}}=8$ and $K_{\mathrm{pred}}\in\{2,4,6,8,12,16,24,32\}$; \textbf{L$_{\mathrm{scan}}$}, a single-seed RefCOCO scan over 10 tap layers together with matched cosine baselines; and \textbf{L$_{\mathrm{seed}}$}, a five-seed RefCOCO study at layer $0$ with the head-only configuration plus grounding-loss and decoding-prior combos.
+The historical study reports four scopes on top of this shared setup: \textbf{S$_{\mathrm{massive}}$}, a 480-run synthetic comparison across 20 seeds, six noise levels, and four methods; \textbf{K$_{\mathrm{mis}}$}, a 160-run synthetic study of cluster-count misspecification with $K_{\mathrm{true}}=8$ and $K_{\mathrm{pred}}\in\{2,4,6,8,12,16,24,32\}$; \textbf{L$_{\mathrm{scan}}$}, a single-seed RefCOCO scan over 10 tap layers together with matched cosine baselines; and \textbf{L$_{\mathrm{seed}}$}, a five-seed RefCOCO study at layer $0$ with the head-only configuration plus grounding-loss and decoding-prior combos.
 
 \subsection{Data, prompts, and metrics}
 
 The main grounded dataset is RefCOCO \cite{yu2016refcoco}, which is built on COCO images \cite{lin2014coco}. The training split contains 6000 image-expression pairs drawn from val1, val2, val3, testA, and testB. The validation split contains 500 pairs from val0 and is held fixed throughout the study. Boxes are stored as normalized $[x_1,y_1,x_2,y_2] \in [0,1]^4$ coordinates. Every example uses the same prompt: ``Carefully observe the region circled in the image. Describe it in one short noun phrase.'' The token span target is fixed to $[[0,32]]$. The paper focuses on support-map quality on the 500-example val0 split rather than on noun-phrase exact match.
 
-These are custom historical partitions, not a verified official RefCOCO test protocol. Without the original manifests, split isolation and image disjointness cannot be audited. In the historical study we evaluate the token-conditioned support maps directly using pointing accuracy, Recall@5 / @10, and AUROC for separating patches inside versus outside the reference box. The main real-data baseline is a same-layer cosine affinity with no trained head. On synthetic data we report support AUROC and supported-mass shift as the primary metrics, together with reconstruction and cluster-recovery diagnostics when relevant. For the five-seed layer-$0$ study we report mean $\pm$ standard deviation and paired two-sided $t$-tests against the cosine baseline or between matched variants.
+These are custom historical partitions, not a verified official RefCOCO test protocol. Without the original manifests, split isolation and image disjointness cannot be audited. The historical study evaluates the token-conditioned support maps directly using pointing accuracy, Recall@5 / @10, and AUROC for separating patches inside versus outside the reference box. The main real-data baseline is a same-layer cosine affinity with no trained head. The primary synthetic metrics are support AUROC and supported-mass shift, together with reconstruction and cluster-recovery diagnostics when relevant. The five-seed layer-$0$ summary reports mean $\pm$ standard deviation and paired two-sided $t$-tests against the cosine baseline or between matched variants.
 
 \begin{table}[htbp]
 \caption{Reported experiments on Gemma 4 E2B.}
@@ -296,7 +296,7 @@ The reported experiments still do \emph{not} include multi-backbone transfer, Re
 \subsection{Assets and licenses}
 \label{sec:assets}
 
-We treat asset provenance as part of the experimental specification. RefCOCO examples inherit the original COCO image restrictions rather than a single dataset-wide license, so the source images are not redistributed with the paper materials. Likewise, the Gemma 4 E2B weights remain governed by the original Apache~2.0 model license. Synthetic data are generated on the fly from the reported seeds and hyperparameters.
+Asset provenance forms part of the experimental specification. RefCOCO examples inherit the original COCO image restrictions rather than a single dataset-wide license, so the source images are not redistributed with the paper materials. Likewise, the Gemma 4 E2B weights remain governed by the original Apache~2.0 model license. Synthetic data are generated on the fly from the reported seeds and hyperparameters.
 
 \begin{table}[htbp]
 \caption{Frozen assets and provenance information for the reported experiments.}
@@ -323,7 +323,7 @@ The earlier manuscript describes recording seeds, method families, layer taps, c
 
 The main synthetic negative control is an unconstrained low-rank factorization, with random and NMF references reported as context. On real data, the main baseline is same-layer cosine affinity with no trained head; this does not isolate co-clustering from the benefit of learning. The main ablations are therefore (i) CoGround versus low-rank on synthetic data, (ii) robustness under $K$ mismatch, (iii) trained-head versus cosine scans across 10 layers, and (iv) head-only versus grounding-loss and decoding-prior combos at layer $0$.
 
-Reproducibility in this paper is tied to a compact set of auditable fields: seed set, noise level, method family, $K_{\mathrm{true}}$, $K_{\mathrm{pred}}$, tap layer, extracted hidden-state layer, and all loss weights. We also specify the shared hardware configuration and the aggregate runtime budget used for the reported experiments. The earlier draft estimates four wall-clock hours on two A100 cards, or eight GPU-hours, but full runtime records are absent. This estimate is not a measured compute budget for the corrected campaign. The synthetic results are aggregated over 20 seeds (or 10 seeds for $K$ mismatch) with paired $t$-tests; the real-data layer-$0$ comparison is aggregated over five seeds with a paired $t$-test against the deterministic cosine baseline, while the 10-tap scan is interpreted descriptively.
+Reproducibility in this paper is tied to a compact set of auditable fields: seed set, noise level, method family, $K_{\mathrm{true}}$, $K_{\mathrm{pred}}$, tap layer, extracted hidden-state layer, and all loss weights. The shared hardware configuration and the estimated aggregate runtime budget are also described. The earlier draft estimates four wall-clock hours on two A100 cards, or eight GPU-hours, but full runtime records are absent. This estimate is not a measured compute budget for the corrected campaign. The synthetic results are aggregated over 20 seeds (or 10 seeds for $K$ mismatch) with paired $t$-tests; the real-data layer-$0$ comparison is aggregated over five seeds with a paired $t$-test against the deterministic cosine baseline, while the 10-tap scan is interpreted descriptively.
 
 \section{Evaluation Hypotheses}
 \label{sec:hypotheses}
@@ -341,7 +341,7 @@ Since RefCOCO does not provide unsupported-token labels and the layer scan is si
 \section{Results and Analysis}
 \label{sec:results}
 
-We retain the synthetic and RefCOCO summaries from the original manuscript. They describe a historical exploratory study, not a rerun of the corrected implementation. Figure~\ref{fig:results_summary} summarizes the synthetic and real-data trends side by side, which keeps the empirical story on one page. The real-data results add a multi-seed comparison against a same-layer cosine baseline and clarify that the gain is localized to the earliest tap rather than spread uniformly across the stack; exact numeric values are deferred to Tables~\ref{tab:synthetic_massive}--\ref{tab:lt0_multiseed} in the appendix.
+I retain the synthetic and RefCOCO summaries from the original manuscript. They describe a historical exploratory study, not a rerun of the corrected implementation. Figure~\ref{fig:results_summary} summarizes the synthetic and real-data trends side by side, which keeps the empirical story on one page. The real-data results add a multi-seed comparison against a same-layer cosine baseline and clarify that the gain is localized to the earliest tap rather than spread uniformly across the stack; exact numeric values are deferred to Tables~\ref{tab:synthetic_massive}--\ref{tab:lt0_multiseed} in the appendix.
 
 \subsection{Massive synthetic study}
 
@@ -354,17 +354,17 @@ The main synthetic study isolates the mechanism under known ground truth and sca
 \label{fig:results_summary}
 \end{figure}
 
-The historical summaries are consistent with H1 within the matched block generator. Across a $32\times$ noise range, CoGround stays well above chance while low-rank remains essentially chance-level on AUROC and consistently produces a \emph{negative} supported-mass shift. The paired AUROC tests range from $t=9.32$ to $20.16$, and the paired supported-mass-shift tests range from $t=8.81$ to $17.34$; all corresponding $p$-values are below $10^{-7}$. These reported statistics cannot be independently recomputed without the per-run outputs, and the matched block generator alone cannot establish broad superiority of simplex constraints. NMF remains strong on this stylized generator, so our main claim is specifically about the value of the simplex-constrained learned factorization relative to the unconstrained low-rank control.
+The historical summaries are consistent with H1 within the matched block generator. Across a $32\times$ noise range, CoGround stays well above chance while low-rank remains essentially chance-level on AUROC and consistently produces a \emph{negative} supported-mass shift. The paired AUROC tests range from $t=9.32$ to $20.16$, and the paired supported-mass-shift tests range from $t=8.81$ to $17.34$; all corresponding $p$-values are below $10^{-7}$. These reported statistics cannot be independently recomputed without the per-run outputs, and the matched block generator alone cannot establish broad superiority of simplex constraints. NMF remains strong on this stylized generator, so the comparison concerns the simplex-constrained learned factorization relative to the unconstrained low-rank control.
 
 \subsection{Robustness to cluster-count mismatch}
 
-We next test the realistic setting in which the true latent cluster count is unknown. The lower-left and lower-right synthetic panels in Figure~\ref{fig:results_summary} (exact values in Table~\ref{tab:kmismatch}) fix $K_{\mathrm{true}}=8$ and vary the predicted cluster count from $2$ to $32$ at $\sigma=0.2$, aggregating over 10 seeds per setting.
+The historical cluster-count study considers the setting in which the true latent cluster count is unknown. The lower-left and lower-right synthetic panels in Figure~\ref{fig:results_summary} (exact values in Table~\ref{tab:kmismatch}) fix $K_{\mathrm{true}}=8$ and vary the predicted cluster count from $2$ to $32$ at $\sigma=0.2$, aggregating over 10 seeds per setting.
 
 The reported means support the descriptive H2 trend within this generator family. CoGround degrades gracefully when $K_{\mathrm{pred}}$ is too small and improves monotonically in mean performance as $K_{\mathrm{pred}}$ becomes larger than $K_{\mathrm{true}}$, reaching AUROC $0.981$ at $K_{\mathrm{pred}}=32$. The low-rank control, by contrast, remains near chance across the whole sweep and keeps a negative supported-mass shift at every tested $K$. Within this generator family, over-parameterization therefore acts as a refinement of the support score rather than as a source of collapse.
 
 \subsection{RefCOCO layer sensitivity and multi-seed observations}
 
-We now turn to the real-data results. The first question is whether a trained head beats a same-layer cosine baseline uniformly across the LM stack. The right block of Figure~\ref{fig:results_summary} answers that question with a 10-tap single-seed scan and a layer-$0$ multi-seed summary; exact values remain in Tables~\ref{tab:layertap_scan} and \ref{tab:lt0_multiseed}.
+The real-data results provide a second diagnostic perspective. The first question is whether a trained head beats a same-layer cosine baseline uniformly across the LM stack. The right block of Figure~\ref{fig:results_summary} answers that question with a 10-tap single-seed scan and a layer-$0$ multi-seed summary; exact values remain in Tables~\ref{tab:layertap_scan} and \ref{tab:lt0_multiseed}.
 
 The layer scan sharpens the interpretation of the layer sensitivity result. The gain over same-layer cosine is \emph{not} uniform across taps: it is clearly strongest at layer $0$, where the head improves pointing by $+0.104$, and mostly disappears or changes sign at deeper taps. The cosine baseline itself is non-monotone, peaking around layers $12$--$16$, which suggests that raw similarity and learned co-clustering exploit different parts of the stack. The safest interpretation is therefore that the learned head adds the most value before the LM has strongly contextualized the visual tokens.
 
@@ -390,7 +390,7 @@ The planned two-A100 configuration uses bf16, per-device batch one, eight accumu
 
 The historical summaries test one favorable synthetic generator and one earlier backbone setup on a custom split. Missing raw artifacts prevent full retrospective verification. The corrected source has unit-tested software contracts, not new benchmark measurements or a validated real-backbone/GPU integration. Block structure can be a poor bias for overlapping or continuous evidence. Pseudoinverse gradients can be unstable near rank changes, and stopping the reconstruction target does not alone prevent a trivial affinity. The generation prior is static and has a contextual-token versus vocabulary-embedding shift. Grounding metrics do not establish reduced hallucination, and the earlier inactive decoding condition provides no compatibility evidence.
 
-The broader impact is also narrow. Better local grounding may reduce unsupported outputs in assistive, educational, or scientific interfaces, but it does not solve factuality in general. The same mechanism could also make surveillance, profiling, or intrusive OCR systems more reliable. We therefore present \method\ as a tool for local grounding and diagnosis, not as a general safety solution.
+The broader impact is also narrow. Better local grounding may reduce unsupported outputs in assistive, educational, or scientific interfaces, but it does not solve factuality in general. The same mechanism could also make surveillance, profiling, or intrusive OCR systems more reliable. I therefore present \method\ as a tool for local grounding and diagnosis, not as a general safety solution.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -418,7 +418,7 @@ This appendix collects complete proofs for the formal properties stated in the m
 \subsection{Optimal block reconstruction under fixed assignments}
 
 \paragraph{Restated assumptions.}
-For Proposition~\ref{prop:ls-block}, the matrices $U \in \R^{N_p \times K_p}$ and $V \in \R^{N_t \times K_t}$ are treated as fixed. We assume first that $U^\top U$ and $V^\top V$ are invertible; the pseudoinverse case is handled afterward.
+For Proposition~\ref{prop:ls-block}, the matrices $U \in \R^{N_p \times K_p}$ and $V \in \R^{N_t \times K_t}$ are treated as fixed. Assume first that $U^\top U$ and $V^\top V$ are invertible; the pseudoinverse case is handled afterward.
 
 \paragraph{Proof of Proposition~\ref{prop:ls-block}.}
 Consider the objective
@@ -469,7 +469,7 @@ Applying it to $UBV^\top$ gives
 \[
 \mathrm{rank}(UBV^\top) \le \min\{\mathrm{rank}(U),\mathrm{rank}(B),\mathrm{rank}(V^\top)\}.
 \]
-Since $\mathrm{rank}(V^\top)=\mathrm{rank}(V)$, $\mathrm{rank}(U)\le K_p$, and $\mathrm{rank}(V)\le K_t$, we obtain
+Since $\mathrm{rank}(V^\top)=\mathrm{rank}(V)$, $\mathrm{rank}(U)\le K_p$, and $\mathrm{rank}(V)\le K_t$, the rank inequalities yield
 \[
 \mathrm{rank}(\hat S) \le \min\{\mathrm{rank}(U),\mathrm{rank}(B),\mathrm{rank}(V)\} \le \min\{K_p,K_t\}.
 \]
