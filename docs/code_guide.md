@@ -167,10 +167,10 @@ not installed by the generic adapter.
 
 ```bash
 python -m pytest -q
-python -m ruff check src scripts tests papers/figures
-python -m ruff format --check src scripts tests papers/figures
+python -m ruff check src scripts tests
+python -m ruff format --check src scripts tests
 ```
 
-See the [technical audit](code_audit.md) for fixes and validation limits.
+See the [experiment protocol](experiments.md) for data, metrics, and evidence limits.
 Original repository material is [CC BY 4.0](../LICENSE); upstream assets retain
 their own terms.

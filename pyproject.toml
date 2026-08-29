@@ -37,7 +37,6 @@ Repository = "https://github.com/hervetrinh/coground-vlm"
 dev = ["pytest>=8.0", "ruff>=0.17.3"]
 gemma4 = ["transformers>=5.5.0"]
 quantization = ["bitsandbytes>=0.43"]
-paper = ["matplotlib>=3.7"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

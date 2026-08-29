@@ -5,7 +5,6 @@
 /tmp/
 /docs/*
 !/docs/experiments.md
-!/docs/code_audit.md
 !/docs/code_guide.md
 
 # Archives, datasets, credentials, weights, and experiment outputs.
@@ -58,3 +57,7 @@ htmlcov/
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+
+# Distribute only the final manuscript PDF.
+/papers/*
+!/papers/main.pdf

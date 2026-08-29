@@ -2,7 +2,7 @@
 
 **Differentiable patch–token co-clustering for visual grounding in vision–language models.**
 
-[Paper (PDF)](papers/main.pdf) · [LaTeX source](papers/main.tex) · [Code guide](docs/code_guide.md) · [Experiment protocol](docs/experiments.md) · [Technical audit](docs/code_audit.md)
+[Paper (PDF)](papers/main.pdf) · [Code guide](docs/code_guide.md) · [Experiment protocol](docs/experiments.md)
 
 Hervé Trinh · Independent Researcher · [trinh.herve@gmail.com](mailto:trinh.herve@gmail.com)
 
@@ -11,7 +11,7 @@ CoGround-VLM compresses a patch–token affinity matrix into soft visual members
 reconstruction `U B Vᵀ` provides spatial evidence maps. A separate experimental
 head can turn the block state into a vocabulary bias during generation.
 
-The manuscript is adapted directly from the original source in `papers/`.
+The research paper is provided as a PDF alongside the PyTorch implementation.
 This is an exploratory research implementation. The paper distinguishes
 historical observations from the corrected experiment protocol. **The corrected
 benchmark campaign has not been executed**, and this release does not establish
@@ -20,23 +20,18 @@ improved hallucination rates or superiority over matched learned baselines.
 ## Repository
 
 ```text
-papers/                  Original manuscript, revised LaTeX, bibliography, PDF
-  figures/               Figure source and compiled figure assets
-  metrics/               Sanitized historical inputs for the paper figures
+papers/main.pdf          Independent research manuscript (PDF)
 src/coground_vlm/        Models, data, metrics, decoding, checkpoint utilities
 configs/                 Grounding, synthetic, ablation, and runtime settings
 scripts/                 Data preparation, training, evaluation, aggregation
 tests/                   CPU unit tests; no model or dataset downloads
-docs/                    Code guide, experiment protocol, technical audit
+docs/                    Code guide and experiment protocol
 pyproject.toml           Package metadata and dependencies
 ```
 
 Datasets, model weights, checkpoints, experiment outputs, ZIP archives, temporary
-files, and private review correspondence are excluded by `.gitignore`. Existing
-local material is preserved on disk. Only the sanitized historical summaries needed for the original paper figures
-are included under `papers/metrics/`. They are historical figure inputs, not new
-benchmark evidence. Raw logs, private conversations, obsolete templates, and
-duplicate manuscripts were moved to a local backup outside this repository.
+files, and private review correspondence are excluded by `.gitignore`. Editable
+manuscript sources and local working material are kept outside this repository.
 
 ## Install and validate
 
@@ -49,8 +44,8 @@ source .venv/bin/activate
 python -m pip install -U pip
 python -m pip install -e '.[dev]'
 python -m pytest -q
-python -m ruff check src scripts tests papers/figures
-python -m ruff format --check src scripts tests papers/figures
+python -m ruff check src scripts tests
+python -m ruff format --check src scripts tests
 ```
 
 The local CPU validation used Python 3.12.9, PyTorch 2.9.1, Transformers 4.57.3,
@@ -65,30 +60,11 @@ Training and benchmark commands are documented in the [code guide](docs/code_gui
 They require separately obtained public datasets and model weights. No training
 or benchmark evaluation runs automatically during installation or testing.
 
-## Build the paper
+## Paper
 
-The PDF uses the standard LaTeX `article` class. It has no conference template
-or company affiliation. From the repository root, use either:
-
-```bash
-tectonic --outdir papers papers/main.tex
-```
-
-or a conventional TeX installation:
-
-```bash
-cd papers
-pdflatex main.tex
-bibtex main
-pdflatex main.tex
-pdflatex main.tex
-```
-
-The original proofs, numerical tables, bibliography, and architecture diagram
-are retained and revised in editable source. To redraw the historical figure
-without running experiments, install `pip install -e '.[paper]'` and run
-`python papers/figures/generate_results_figures.py`. Tectonic may download its
-TeX dependencies on the first build. A compiled [PDF](papers/main.pdf) is included.
+[Read the research paper (PDF)](papers/main.pdf). It is an independent,
+exploratory manuscript; the corrected benchmark campaign has not been executed.
+The PDF is the only manuscript artifact distributed in this repository.
 
 ## Cite
 
